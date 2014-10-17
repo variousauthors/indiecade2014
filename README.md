@@ -1,9 +1,5 @@
-# LÖVE2D Boilerplate
+# IndieCade 2014
 
-A project structure for LÖVE2D with a bunch of helpful libraries.
+This project was lovingly bootstrapped with @nomoon's [LOVE2D boilerplate][0].
 
-See [LAYOUT.md](LAYOUT.md) for more info.
-
-## License
-
-LÖVE2D Boilerplate is licensed under the Apache License, version 2 (see [LICENSE.md](LICENSE.md)).
+[0]: https://github.com/ZNCatlaw/love2d-bp/
