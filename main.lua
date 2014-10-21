@@ -14,6 +14,8 @@ JSON   = require('vendor/dkjson')
 SLAXML = require('vendor/slaxml/slaxdom')
 Sfxr   = require('vendor/sfxr')
 
+Graph = require('libs/graph')
+
 -- Kikito's best libraries
 kikito = {
     anim8   = require('vendor/kikito/anim8'),
