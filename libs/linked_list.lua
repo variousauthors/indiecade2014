@@ -1,4 +1,4 @@
-Node = function (_data, _link)
+local Node = function (_data, _link)
 
     local setNext = function (link)
         _link = link
@@ -29,7 +29,7 @@ end
 -- contain data like { x, y, n } where n is the index of the adjacent vertex
 -- and x, y are data? Then it links to the next adjacency? I think that's
 -- right. So actually, we aren't representing a graph in memory. OK?
-LinkedList = function ()
+local LinkedList = function ()
     local self = {}
 
     local head, tail, length
@@ -282,3 +282,5 @@ l.push(0)
 assert(l.pop() == 0)
 
 print("LINKED LISTS ALL PASS")
+
+return LinkedList
