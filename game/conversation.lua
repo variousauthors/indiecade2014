@@ -13,9 +13,17 @@ Folk = function (name)
         symbols.insert(symbolGraph.sample().data)
     end
 
-    instance.getSymbol = function ()
+    instance.getSymbol = function (current_symbol)
         local symbol = nil
 
+        -- the speaker will either:
+        --   if there is a related symbol in her graph, declare one of them
+        --   repeat the current symbol (which "expands" the conversation)
+        --   declare a terminal symbol, which causes them to leave the conversation
+        --   LATER
+        --   maybe if the terminal symbol comes up, but the relationship
+        --     is strong, she declares a new symbol: (from the graph, her own, or a question mark)
+        --     question mark prompts the next folk to declare their symbol
         i = love.math.random(1, 10) % 3
 
         if i ~= 0 then
@@ -35,6 +43,7 @@ Conversation = function (folks)
 
     local iterator = folks.getIterator()
     local active = iterator.getNext().getData()
+    local current_symbol = nil
 
     local getNext = function ()
         local result = nil
@@ -51,7 +60,7 @@ Conversation = function (folks)
 
     local advance = function ()
         -- the active speaker acts
-        local symbol = active.getSymbol()
+        local symbol = active.getSymbol(current_symbol)
 
         if symbol == nil then
             print(active.getName() .. ": " .. "...")
@@ -61,6 +70,7 @@ Conversation = function (folks)
 
         -- advance to the next speaker
         active = getNext()
+        current_symbol = symbol
     end
 
     instance.update = function (dt)

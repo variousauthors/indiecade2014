@@ -164,6 +164,25 @@ local LinkedList = function ()
         end
     end
 
+    local doesInclude = function (data)
+        local iterator = getIterator()
+        local index = 0
+        local includes = false
+
+        while (iterator.hasNext()) do
+            local node = iterator.getNext()
+            local n_data = node.getData()
+
+            index = index + 1
+
+            if n_data == data then
+                includes = true
+            end
+        end
+
+        return includes
+    end
+
     local isEmpty = function ()
         return getLength() == 0
     end
@@ -178,6 +197,7 @@ local LinkedList = function ()
     self.init        = init
     self.unit        = unit
     self.isEmpty     = isEmpty
+    self.doesInclude = doesInclude
 
     return self.init()
 end
@@ -231,6 +251,12 @@ assert(i.getNext() == nil)
 -- can append 3 elements to a linked list
 l.append(0).append(1).append(2)
 assert(l.getLength() == 3)
+
+-- can find element in the list
+assert(l.doesInclude(2) == true)
+
+-- cannot find elements not in the list
+assert(l.doesInclude(3) == false)
 
 -- can iterate a linked list
 i = l.getIterator()
