@@ -38,8 +38,30 @@ local Graph = function ()
         }
     end
 
+    local rawDataFind = function (data)
+        local node
+        local index = 0
+
+        while (node == nil and index < #adjacency_list) do
+            local n = adjacency_list[index]
+
+            if n.data and n.data == data then
+                node = {
+                    data = n.data,
+                    nid = n.nid
+                }
+            end
+
+            index = index + 1
+        end
+
+        return node
+    end
+
     -- returns the first node matching all params in both key and value
     local find = function (params)
+        if type(params) ~= "table" then return rawDataFind(params) end
+
         local node
 
         for i, n in pairs(adjacency_list) do
@@ -174,7 +196,7 @@ local Graph = function ()
 
         return n
     end
-    
+
     instance.connect = connect
     instance.getSize = getSize
     instance.insert = insert
@@ -223,6 +245,9 @@ assert(n3.data["v6"] == "v6")
 
 local n4 = g1.find({ v5 = "v5", vx = "vx" }) -- a partial match returns nil
 assert(n4 == nil)
+
+local n5 = g1.find("v3") -- just find plain data
+assert(n5.data == "v3")
 
 local nodes1 = g1.where({ v5 = "v5" }) -- table of all nodes having the keys and values
 assert(#nodes1 == 2)
