@@ -2,18 +2,62 @@
 -- two or more participants
 -- every few seconds, the conversation runs its update function
 
-local symbolGraph = require('game/symbols')
+local masterSymbolGraph = require('game/symbols')
 
 -- every folk has access to some nodes from the Symbol graph
 Folk = function (name)
     local instance = {}
     local symbols = Graph()
 
-    for i = 1, love.math.random(3, 5) do
-        symbols.insert(symbolGraph.sample().data)
+    -- folk needs a partial symbol graph
+    -- insert a node randomly,
+    -- insert another node randomly and check if there are any
+    -- edges to any existing nodes: if so insert those edges
+    local copyNode = function (vertex)
+        -- get a node from the graph
+        -- if that node is not in the local copy
+        -- insert that node
+        -- now run hasEdge on each pair with that node
+        -- if hasEdge is true, connect the pair
+
+        local insert = false
+
+        -- insert the symbol if it isn't already in the graph
+        if symbols.doesInclude(vertex.data) then
+            if symbols.count(vertex.data) < masterSymbolGraph.count(vertex.data) then
+                insert = true
+            end
+        else
+            insert = true
+        end
+
+        if insert == true then
+            local neighbours = masterSymbolGraph.getConnectedSet(vertex)
+
+            -- insert the symbol and map to our local copy
+            symbols.insert(vertex.data)
+            vertex = symbols.find(vertex.data)
+
+            -- update the edges to reflect the mastersymbolgraph
+            -- get the neighbours from the master graph
+            for i, v in pairs(neighbours) do
+                v = symbols.find(v.data) -- local copy
+
+                -- if any of those neighbours exist in the local graph
+                if v ~= nil then
+                    symbols.connect(vertex, v)
+                end
+            end
+        end
     end
 
-    instance.getSymbol = function (current_symbol)
+    for i = 1, love.math.random(3, 5) do
+        copyNode(masterSymbolGraph.sample())
+    end
+
+    love.debug.print(symbols.toString())
+
+    local getSymbol = function (current_symbol)
         local symbol = nil
 
         -- the speaker will either:
@@ -33,7 +77,10 @@ Folk = function (name)
         return symbol
     end
 
-    instance.getName = function () return name end
+    local getName = function () return name end
+
+    instance.getSymbol = getSymbol
+    instance.getName = getName
 
     return instance
 end

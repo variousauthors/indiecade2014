@@ -26,6 +26,7 @@ local Graph = function ()
             uid = uid + 1
             size = size + 1
         end
+
     end
 
     local sample = function ()
@@ -42,7 +43,7 @@ local Graph = function ()
         local node
         local index = 0
 
-        while (node == nil and index < #adjacency_list) do
+        while (node == nil and index < size) do
             local n = adjacency_list[index]
 
             if n.data and n.data == data then
@@ -59,6 +60,7 @@ local Graph = function ()
     end
 
     -- returns the first node matching all params in both key and value
+    -- or, if passed a literal, returns a node containing that literal
     local find = function (params)
         if type(params) ~= "table" then return rawDataFind(params) end
 
@@ -197,6 +199,45 @@ local Graph = function ()
         return n
     end
 
+    local hasEdge = function (v1, v2)
+        local v1 = adjacency_list[v1.nid]
+        local it = v1.neighbours.getIterator()
+        local has = false
+
+        while (has == false and it.hasNext()) do
+            local nid = it.getNext().getData()
+
+            if nid == v2.nid then
+                has = true
+            end
+        end
+
+        return has
+    end
+
+    -- returns all vertices that are fully connected to the given vertex
+    local getConnectedSet = function (vertex)
+        local vertices = {}
+        local vertex = adjacency_list[vertex.nid]
+        local it = vertex.neighbours.getIterator()
+
+        while (it.hasNext()) do
+            local nid = it.getNext().getData()
+            -- wrap the neighbour so that we can test it
+            local v = {
+                data = adjacency_list[nid].data,
+                nid = nid
+            }
+
+            -- if the incident edge also exists
+            if hasEdge(v, vertex) then
+                table.insert(vertices, v)
+            end
+        end
+
+        return vertices
+    end
+
     instance.connect = connect
     instance.getSize = getSize
     instance.insert = insert
@@ -206,6 +247,8 @@ local Graph = function ()
     instance.toString = toString
     instance.doesInclude = doesInclude
     instance.count = count
+    instance.hasEdge = hasEdge
+    instance.getConnectedSet = getConnectedSet
 
     return instance
 end
@@ -255,9 +298,22 @@ assert(#nodes1 == 2)
 local nodes2 = g1.where({ v5 = "v5", v6 = "v6" }) -- table of all nodes having the keys and values
 assert(#nodes2 == 1)
 
---  g1.edge(n1, n2) -- an edge from n1 to n2 (default weight)
---  g1.edge(n2, n1, 4) -- the reverse edge (weighted)
---  g1.hasEdge(n1, n2) -- test edge
+g1.connect(n1, n2)
+assert(g1.hasEdge(n1, n2) == true) -- test edge added
+
+local nodes3 = g1.getConnectedSet(n1) -- the collection of connected edges
+assert(#nodes3 == 1)
+assert(nodes3[1].nid == n2.nid) -- should contain n2
+
+g1.connect(n1, n3)
+assert(g1.hasEdge(n1, n3) == true) -- test edge added
+
+-- adding more connected edges gives us a bigger connected set
+local nodes4 = g1.getConnectedSet(n1)
+assert(#nodes4 == 2)
+assert(nodes4[1].nid == n2.nid)
+assert(nodes4[2].nid == n3.nid)
+
 --  e1 = g1.getEdge(n1, n2) -- returns the edge if it exists
 
 --  neighbours = g1.getNeighbours(n1) -- nodes with edges from n1
