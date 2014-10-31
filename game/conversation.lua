@@ -117,6 +117,8 @@ Conversation = function (folks)
     -- folk are the people in the conversation
     -- members are the folk speaking the current symbol (usually one)
     local topic_draw = function ()
+        if topic.symbol == nil then return end
+
         -- determine the center point between the folk
         -- if there are just two folk, offset up by height and a half
         -- of a member
@@ -139,6 +141,9 @@ Conversation = function (folks)
         end
 
         -- put the symbol in the rectangle
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.printf(topic.symbol, center.x, center.y, 0, "center")
+        love.graphics.setColor(255, 255, 255)
     end
 
     topic.draw = topic_draw
@@ -161,16 +166,18 @@ Conversation = function (folks)
         local symbol = active.getSymbol(current_symbol)
 
         if symbol == nil then
+            -- TODO this should end the conversation entirely
+            symbol = "..."
             topic.members = { active }
-            print(active.getName() .. ": " .. "...")
+            -- print(active.getName() .. ": " .. "...")
         elseif symbol == current_symbol then
             -- the speaker is added to the current speach bubble (topic)
             table.insert(topic.members, active)
-            print(active.getName() .. ": " .. symbol)
+            -- print(active.getName() .. ": " .. symbol)
         else
             -- the topic drops to just one speaker
             topic.members = { active }
-            print(active.getName() .. ": " .. symbol)
+            -- print(active.getName() .. ": " .. symbol)
         end
 
         -- advance to the next speaker
